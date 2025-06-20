@@ -4,6 +4,21 @@ vim.opt.shiftwidth = 4        -- Number of spaces to use for each step of (auto)
 vim.opt.softtabstop = 4       -- Number of spaces that a tab counts for while performing editing operations
 vim.opt.smartindent = true    -- Do smart autoindenting when starting a new line
 
+-- Dioxus autocmd
+vim.api.nvim_create_autocmd("BufWritePost", {
+  pattern = "*.rs",
+  callback = function()
+    local cwd = vim.lsp.buf.list_workspace_folders()
+    if not (cwd == null) then
+      if vim.fn.filereadable(cwd[1] .. "/Dioxus.toml") == 1 then
+        local command = "dx fmt --file %"
+        -- vim.notify(command)
+        vim.cmd("silent ! " .. command)
+      end
+    end
+  end,
+})
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
