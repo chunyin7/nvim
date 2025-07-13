@@ -1,20 +1,20 @@
 vim.opt.expandtab = true      -- Use spaces instead of tabs
-vim.opt.tabstop = 4           -- Number of spaces that a tab counts for
-vim.opt.shiftwidth = 4        -- Number of spaces to use for each step of (auto)indent
-vim.opt.softtabstop = 4       -- Number of spaces that a tab counts for while performing editing operations
+vim.opt.tabstop = 2           -- Number of spaces that a tab counts for
+vim.opt.shiftwidth = 2        -- Number of spaces to use for each step of (auto)indent
+vim.opt.softtabstop = 2       -- Number of spaces that a tab counts for while performing editing operations
 vim.opt.smartindent = true    -- Do smart autoindenting when starting a new line
 
 -- Dioxus autocmd
 vim.api.nvim_create_autocmd("BufWritePost", {
   pattern = "*.rs",
   callback = function()
-    local cwd = vim.lsp.buf.list_workspace_folders()
-    if not (cwd == null) then
-      if vim.fn.filereadable(cwd[1] .. "/Dioxus.toml") == 1 then
-        local command = "dx fmt --file %"
-        -- vim.notify(command)
-        vim.cmd("silent ! " .. command)
-      end
+    local cwd = vim.lsp.buf.list_workspace_folders() or {}
+    -- Fallback to the current working directory if no LSP root is available
+    local root = cwd[1] or vim.fn.getcwd()
+    if root and vim.fn.filereadable(root .. "/Dioxus.toml") == 1 then
+      local command = "dx fmt --file %"
+      -- vim.notify(command)
+      vim.cmd("silent ! " .. command)
     end
   end,
 })
@@ -333,6 +333,16 @@ require('lazy').setup({
         --   },
         -- },
         -- pickers = {}
+        pickers = {
+          find_files = {
+            hidden = true,
+          },
+          live_grep = {
+            additional_args = function()
+              return { "--hidden" }
+            end,
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -403,7 +413,7 @@ require('lazy').setup({
       -- Mason must be loaded before its dependents so we need to set it up here.
       -- NOTE: `opts = {}` is the same as calling `require('mason').setup({})`
       { 'williamboman/mason.nvim', opts = {} },
-      'williamboman/mason-lspconfig.nvim',
+      { 'williamboman/mason-lspconfig.nvim', version = '^1.32.0' },
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
@@ -595,7 +605,7 @@ require('lazy').setup({
         -- clangd = {},
         -- gopls = {},
         -- pyright = {},
-        -- rust_analyzer = {},
+        rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
