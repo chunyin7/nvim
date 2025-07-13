@@ -832,8 +832,12 @@ require('lazy').setup({
       -- You can switch between them by passing `mirage = true` or `dark = true`.
       -- If you don't pass anything, it defaults to the light theme.
       require('ayu').setup {
-        mirage = false,
-        dark = false,
+        overrides = {
+          Normal = { bg = 'None' },
+          NormalFloat = { bg = 'None' },
+          FloatBorder = { bg = 'None' },
+          SignColumn = { bg = 'None' },
+        },
       }
       vim.cmd.colorscheme 'ayu'
     end,
